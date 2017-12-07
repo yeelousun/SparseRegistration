@@ -6,7 +6,7 @@ bijiao=zeros(pnum,bijiaonum);
 eC=zeros(bijiaonum,3,pnum);
 for i=1:pnum
 
-T=C(:,:,i);
+T=C{i};
 GMModel =fitgmdist(T,1);
 F=pdf(GMModel,T);
 [GMModel1,F1,X1]=gmpr(F,T);

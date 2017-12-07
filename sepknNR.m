@@ -1,9 +1,12 @@
-function  [C] = sepknNR(F,FD,K)
-
+function  [C,sumpgsize] = sepknNR(F,FD,K)
 pnum=size(FD,1);
-idx=knnsearch(F,FD,'Distance',K);
+idx=rangesearch(F,FD,K);
 C=cell(1,pnum);
+sumpgsize=zeros(1,pnum);
+idxr=rangesearch(F,FD,K*2);
 for i=1:pnum
-C{i}=F(idx(i,:),:);
+sumpgsize(i)=size(idxr{i},2);
+C{i}=F(idx{i},:);
 end
+
 end

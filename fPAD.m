@@ -32,8 +32,9 @@ end
 
 [bijiao1(i,:),bijiao2(i,:)]=hist(dic);
 end
-
-id=sum(bijiao1(:,:)~=0,2)<1;
+%need more than nz non-zero point in feature
+nz=1;
+id=sum(bijiao1(:,:)~=0,2)<nz;
 bijiao1(id,:)=[];
 C1(:,:,id)=[];
 

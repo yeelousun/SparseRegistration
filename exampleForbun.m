@@ -45,10 +45,13 @@ hold off
 
 %Point Group
 %number of PG
-PGnumofPC=0.005;
-%number of point in PG
-PnumofPG=0.01;
-PGNum=fix(PnumofPG*size(P.Location,1));
+PGnumofPC=0.01;
+%radius of PG //precent of point cloud
+PGRper=0.01;
+%Threshold of point in PG//precent of max number of PG
+PGNumT=0.8;
+
+
 Pdown = pcdownsample(P,'random',PGnumofPC);
 Qdown = pcdownsample(Q,'random',PGnumofPC);
 
@@ -57,18 +60,26 @@ Qpc=Q.Location;
 
 Pdownpc=Pdown.Location;
 Qdownpc=Qdown.Location;
+%radius of computeRadiusPG
+PGRtest=0.01;
+%radius of PG 
+PGR=computeRadius(Ppc,Pdownpc,PGRtest,PGRper);
+[PC,Ppgnum]=sepknNR(Ppc,Pdownpc,PGR);
+[QC,Qpgnum]=sepknNR(Qpc,Qdownpc,PGR);
+Tedge=linspace(min(Ppgnum),max(Ppgnum),10);
 
-PC=sepknNR(Ppc,Pdownpc,PGNum);
-QC=sepknNR(Qpc,Qdownpc,PGNum);
+[Pdownpc,PC]=FindEdge(Pdownpc,PC,Ppgnum,Tedge(1),PGNumT*Tedge(10));%5~8
+[Qdownpc,QC]=FindEdge(Qdownpc,QC,Qpgnum,Tedge(1),PGNumT*Tedge(10));
 
 figure('Name','point groups in point cloud')
 hold on
-pcshow(Q.Location(1,:),'r');
-for i=1:size(PC,3)
-plot3(PC(:,1,i),PC(:,2,i),PC(:,3,i),'.');
+pcshow(P.Location,'b');
+pcshow(Q.Location,'r');
+for i=1:size(PC,2)
+plot3(PC{i}(:,1),PC{i}(:,2),PC{i}(:,3),'.');
 end
-for i=1:size(QC,3)
-plot3(QC(:,1,i),QC(:,2,i),QC(:,3,i),'.');
+for i=1:size(QC,2)
+plot3(QC{i}(:,1),QC{i}(:,2),QC{i}(:,3),'.');
 end
 hold off
 view(0,90);
@@ -109,7 +120,7 @@ figure('Name','point cloud P_Noise_Out and PG matched')
 plot3(Ppc(:,1),Ppc(:,2),Ppc(:,3),'.');
 hold on
 for i=1:size(matchP,2)
-plot3(PC(:,1,matchP(i)),PC(:,2,matchP(i)),PC(:,3,matchP(i)),'o');
+plot3(PC{matchP(i)}(:,1),PC{matchP(i)}(:,2),PC{matchP(i)}(:,3),'o');
 end
 hold off
 
@@ -117,7 +128,7 @@ figure('Name','point cloud Q_Noise_Out and PG matched')
 plot3(Qpc(:,1),Qpc(:,2),Qpc(:,3),'.');
 hold on
 for i=1:size(matchQ,2)
-plot3(QC(:,1,matchQ(i)),QC(:,2,matchQ(i)),QC(:,3,matchQ(i)),'o');
+plot3(QC{matchQ(i)}(:,1),QC{matchQ(i)}(:,2),QC{matchQ(i)}(:,3),'o');
 end
 hold off
 %Register point cloud
@@ -130,12 +141,12 @@ DisR=zeros(1,1);
 DisT=zeros(1,1);
 for i=1:size(matchQ,2)
 % if(Dis(i)>0.0)
-PQdis=Rcpddis(PC(:,:,matchP(i)),QC(:,:,matchQ(i)));
+PQdis=Rcpddis(PC{matchP(i)},QC{matchQ(i)});
 disply=0;
 if(PQdis<10)%30
 fa(n)=i;
 % test
-[cpdR1 ,cpdT1,Qrt,Qpgrt ]=Rcpd(PC(:,:,matchP(i)),QC(:,:,matchQ(i)),Ppc,Qpc,disply);
+[cpdR1 ,cpdT1,Qrt,Qpgrt ]=Rcpd(PC{matchP(i)},QC{matchQ(i)},Ppc,Qpc,disply);
 DisR(n)=sum(sum(abs(cpdR1-RO)));
 DisT(n)=sum(sum(abs(cpdT1+TO')));
 %Ricp(Qpgrt,PC(:,:,matchP(i)),Qrt,Ppc);
@@ -152,10 +163,10 @@ disply=1;
 for i=fa(rows):fa(rows)
 % if(Dis(i)>0.0)
 % test
-[cpdR1 ,cpdT1,Qrt,Qpgrt ]=Rcpd(PC(:,:,matchP(i)),QC(:,:,matchQ(i)),Ppc,Qpc,disply);
+[cpdR1 ,cpdT1,Qrt,Qpgrt ]=Rcpd(PC{matchP(i)},QC{matchQ(i)},Ppc,Qpc,disply);
 Rerror=sum(sum(abs(cpdR1-RO)))
 Terror=sum(sum(abs(cpdT1+TO')))
-Ricp(Qpgrt,PC(:,:,matchP(i)),Qrt,Ppc);
+Ricp(Qpgrt,PC{matchP(i)},Qrt,Ppc);
 end
 t2=clock; 
 systemcost=etime(t2,t1) 
