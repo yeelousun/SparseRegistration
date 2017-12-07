@@ -1,8 +1,9 @@
-function [ bijiao1 ] = fPAD( FD,C )
+function [ bijiao1,C1 ] = fPAD( FD,C )
 
 pnum=size(FD,1);
 bijiao1=zeros(pnum,10);
 bijiao2=zeros(pnum,10);
+C1=C;
 for i=1:pnum
 T=C(:,:,i)';
 
@@ -32,6 +33,9 @@ end
 [bijiao1(i,:),bijiao2(i,:)]=hist(dic);
 end
 
+id=sum(bijiao1(:,:)~=0,2)<1;
+bijiao1(id,:)=[];
+C1(:,:,id)=[];
 
 end
 

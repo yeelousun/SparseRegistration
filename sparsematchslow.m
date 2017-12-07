@@ -1,4 +1,4 @@
-function [ matchA,matchB ] = sparsematchslow( bijiao1,bijiao2,dicn )
+function [ matchA,matchB ] = sparsematchslow( bijiao1,bijiao2,dicn,misserror )
 
 A=bijiao1;
 B=bijiao2;
@@ -29,9 +29,11 @@ matchnum=1;
 for i =1:Bnum
   
     gammaB = omp(Dic, B(i,:)',[],4)';
+    %gammaB = omp(Dic'*B(i,:)',Dic'*Dic,4);
+    %gammaB=gammaB';
     err =    B(i,:)'- Dic*gammaB';
     
-    if(sum(abs(err))>0&&sum(abs(err))<0.5)
+    if(sum(abs(err))>0&&sum(abs(err))<misserror)
         %figure
         %plot(B(i,:)')
         %hold on
@@ -45,7 +47,7 @@ for i =1:Bnum
         my_rows
         i
         if(sum(abs(bijiao1(my_rows,:)-bijiao2(i,:)))>10)
-           break;
+           continue;
         end
         fprintf('--------------\n');
         fprintf('P:');
@@ -56,7 +58,7 @@ for i =1:Bnum
            err
     matchnum=matchnum+1;
     end
-    if(matchnum>100)
+    if(matchnum>200)
         break
     end
 end

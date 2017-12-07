@@ -1,11 +1,11 @@
-function [R,T,Yicp,Yicp1] = Rcpd( X,Y,X1,Y1 )
+function [R,T,Yicp,Yicp1] = Rcpd( X,Y,X1,Y1,dis )
 
 % add a random rigid transformation
 
 % Set the options
 
 opt.method='rigid'; % use rigid registration
-opt.viz=0;          % show every iteration
+opt.viz=dis;          % show every iteration
 opt.outliers=0.6;     % do not assume any noise 
 
 opt.normalize=1;    % normalize to unit variance and zero mean before registering (default)
@@ -23,8 +23,10 @@ opt.tol=1e-8;       % tolerance
 %figure,cpd_plot_iter(X1, Y1); title('Before');
 %figure,cpd_plot_iter(X, Transform.Y);  title('After registering Y to X');
 
-Yicp = Transform.R *  Y1' + repmat(Transform.t, 1,size(Y1,1) );
-Yicp1 = Transform.R *  Y' + repmat(Transform.t, 1,size(Y,1) );
+%Transform.Y=T*normal.xscale+repmat(normal.xd,M,1);
+Yicp = Transform.s*Transform.R *  Y1' + repmat(Transform.t, 1,size(Y1,1) );
+%Yicp=Transform.normal.xscale*Yicp2'+repmat(Transform.normal.xd,1,size(Y1,1));
+Yicp1 = Transform.s*Transform.R *  Y' + repmat(Transform.t, 1,size(Y,1) );
 ptCloudP = pointCloud(X1);
 ptCloudQ = pointCloud(Yicp');
 ptCloudP1 = pointCloud(X);
@@ -45,7 +47,7 @@ title('CPD After registering Q to P');
 % plot3(ptCloudQ.Location(:,1),ptCloudQ.Location(:,2),ptCloudQ.Location(:,3),'r.');
 % axis off
 end
-R=Transform.R;
+R=Transform.s*Transform.R;
 T=Transform.t;
 Yicp=Yicp';
 Yicp1=Yicp1';
