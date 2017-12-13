@@ -1,13 +1,14 @@
-function [ PC , FC2 ] = SpFeature( FD,FC,n )
+function [ PC , FC2 ] = SpFeature( FD,FC )
 
 
 pnum=size(FD,1);
 FC2=zeros(121,3,pnum);
-downNum=n;
+
 PC=zeros(121,pnum);
 
 for i=1:pnum
-A=FC(:,:,i);
+A=FC{i};
+downNum=size(A,1);
 if(mod(i,100)==0)
     disp('*');
     i

@@ -45,7 +45,7 @@ hold off
 
 %Point Group
 %number of PG
-PGnumofPC=0.02;
+PGnumofPC=0.002;
 
 %radius of PG //precent of point cloud
 PGRper=0.01;
