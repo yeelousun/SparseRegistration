@@ -25,11 +25,14 @@ if (xyz0*V(:,3)<0)
     V(:,3)=-V(:,3);
 end
 
-
+try
 Up=U(1:n,1:3);
 Sp=S(1:3,1:3);
 Vp=V(:,1:3)';
-
+catch
+U
+return
+end
 B=Up*Sp*Vp;
 
 end

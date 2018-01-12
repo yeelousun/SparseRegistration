@@ -15,8 +15,16 @@ hold on
 pcshow(Q.Location,'r');
 hold off
 view(0,90);
+%miss points
+misP=50;
+if(misP)
+idx=knnsearch(P.Location,P.Location(31000,:),'k',misP);   
+Pmis=P.Location;
+Pmis(idx,:)=[];
+P =pointCloud(Pmis);
+end
 %Add noise
-pSNR=0;
+pSNR=50;
 
 if(pSNR)    
 noisep =awgn(P.Location,pSNR,'measured'); 
@@ -26,7 +34,8 @@ noisep =awgn(Q.Location,pSNR,'measured');
 Q =pointCloud(noisep);
 end
 %Add outliers
-pOUT=0;
+pOUT=500;
+
 if(pOUT)
 AOut = (rand(pOUT,3)-0.5)*0.2+repmat(mean(P.Location)', 1, pOUT)';
 outp=[P.Location;AOut];
@@ -38,14 +47,16 @@ Q =pointCloud(outp);
 end
 
 figure('Name','point cloud P_Noise_Out and Q_Noise_Out')
-pcshow(P);
+pcshow(P.Location,'b');
 hold on
-pcshow(Q);
+pcshow(Q.Location,'r');
 hold off
+view(0,90);
+
 
 %Point Group
 %number of PG
-PGnumofPC=0.02;
+PGnumofPC=0.1;
 
 %radius of PG //precent of point cloud
 PGRper=0.01;
@@ -70,8 +81,8 @@ PGR=computeRadius(Ppc,Pdownpc,PGRtest,PGRper);
 [QC,Qpgnum]=sepknNR(Qpc,Qdownpc,PGR);
 Tedge=linspace(min(Ppgnum),max(Ppgnum),10);
 
-[Pdownpc,PC]=FindEdge(Pdownpc,PC,Ppgnum,Tedge(1),PGNumT*Tedge(10));%5~8
-[Qdownpc,QC]=FindEdge(Qdownpc,QC,Qpgnum,Tedge(1),PGNumT*Tedge(10));
+[Pdownpc,PC]=FindEdge(Pdownpc,PC,Ppgnum,Tedge(2),PGNumT*Tedge(10));%5~8
+[Qdownpc,QC]=FindEdge(Qdownpc,QC,Qpgnum,Tedge(2),PGNumT*Tedge(10));
 
 figure('Name','point groups in point cloud')
 hold on
@@ -111,7 +122,7 @@ if(SpF)
 [PF,PC2]=SpFeature( Pdownpc,PC );
 [QF,QC2]=SpFeature( Qdownpc,QC );
 Fn=121;
-misserror=0.1;
+misserror=0.15;
 end
 %Match feature
 disp('start match group');
@@ -165,10 +176,13 @@ disply=1;
 for i=fa(rows):fa(rows)
 % if(Dis(i)>0.0)
 % test
+%[cpdR1 ,cpdT1,Qrt,Qpgrt ]=Rcpd(PC2(:,:,matchP(i)),QC2(:,:,matchQ(i)),Ppc,Qpc,disply);
+
 [cpdR1 ,cpdT1,Qrt,Qpgrt ]=Rcpd(PC{matchP(i)},QC{matchQ(i)},Ppc,Qpc,disply);
 Rerror=sum(sum(abs(cpdR1-RO)))
 Terror=sum(sum(abs(cpdT1+TO')))
-Ricp(Qpgrt,PC{matchP(i)},Qrt,Ppc);
+Ricp(Ppc,Qrt,Ppc,Qrt);
 end
 t2=clock; 
 systemcost=etime(t2,t1) 
+

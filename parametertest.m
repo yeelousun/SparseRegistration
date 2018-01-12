@@ -60,7 +60,7 @@ end
 % PGRper=0.012;
 
 %Threshold of point in PG//precent of max number of PG
-PGNumT=0.9;%0.8
+PGNumT=1;%0.8
 
 
 Pdown = pcdownsample(P,'random',PGnumofPC);
@@ -195,7 +195,7 @@ Rerror=sum(sum(abs(cpdR1-RO)))
 Terror=sum(sum(abs(cpdT1+TO')))
 Ricp(Qpgrt,PC{matchP(i)},Qrt,Ppc);
 end
-if (Rerror>0.6)
+if (Rerror>0.4)
     res=3;
     return
 end
